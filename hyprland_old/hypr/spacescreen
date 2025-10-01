@@ -1,0 +1,202 @@
+@startuml
+entity "users" as users {
+  * user_id : int
+  --
+  username : varchar(16)
+  login : varchar(255)
+  password : varchar(24)
+  bonus_points : int
+}
+
+entity "active_orders" as active_orders {
+  * order_id : int
+  --
+  user_id : int
+  restaurant_id : int
+  total_cost : money
+  status_id : int
+  created_at : timestamp
+}
+
+entity "order_history" as order_history {
+  * order_id : int
+  --
+  user_id : int
+  restaurant_id : int
+  total_cost : money
+  status_id : int
+  created_at : timestamp
+  completed_at : timestamp
+}
+
+entity "order_dishes" as order_dishes {
+  * order_id : int
+  * dish_id : int
+}
+
+entity "order_status" as order_status {
+  * status_id : int
+  --
+  name : varchar(50)
+  lft : int
+  rgt : int
+}
+
+entity "favorite_dish" as favorite_dish {
+  * user_id: int
+  * dish_id: int
+}
+
+entity "coupons" as coupons {
+  * coupon_id : int
+  --
+  code : varchar(8)
+  discount_type : varchar(20)
+  discount_value : numeric
+  valid_from : date
+  valid_to : date
+  min_order : money
+}
+
+entity "used_coupons" as used_coupons {
+  * use_id : int
+  --
+  user_id : int
+  order_id : int
+  coupon_id : int
+  used_at : timestamp
+}
+
+entity "restaurants" as restaurants {
+  * restaurant_id : int
+  --
+  address : varchar(50)
+  manager_id : int
+  daily_income : money
+}
+
+entity "menu_items" as menu_items {
+  * dish_id : int
+  --
+  restaurant_id : int
+  name : varchar(100)
+  cost : money
+  weight_grams : int
+  carbs : numeric
+  fats : numeric
+  proteins : numeric
+  category_id : int
+}
+
+entity "dish_categories" as dish_categories {
+  * category_id : int
+  --
+  name : varchar(50)
+}
+
+entity "employees" as employees {
+  * employee_id : int
+  --
+  position : varchar(24)
+  salary : money
+  contact_phone : varchar(8)
+  full_name : varchar(24)
+}
+
+entity "restaurant_employees" as restaurant_employees {
+  * restaurant_id : int
+  * employee_id : int
+}
+
+entity "storage_restaurants" as storage_restaurants {
+  * storage_id : int
+  * restaurant_id : int
+}
+
+entity "storage_products" as storage_products {
+  * storage_id : int
+  * product_id : int
+  --
+  quantity : int
+}
+
+entity "products" as products {
+  * product_id : int
+  --
+  name : varchar(16)
+  unit : varchar(5)
+  category_id : int
+  stock : numeric
+}
+
+entity "storages" as storages {
+  * storage_id : int
+  --
+  address : varchar(255)
+  type_id : int
+  capacity : numeric
+}
+
+entity "suppliers" as suppliers {
+  * supplier_id : int
+  --
+  contact_phone : varchar(16)
+  email : varchar(50)
+  address : varchar(100)
+  status : varchar(50)
+}
+
+entity "supplier_products" as supplier_products {
+  * supplier_id : int
+  * product_id : int
+  --
+  price : money
+  delivery_volume: numeric
+}
+
+entity "product_orders" as product_orders {
+  * order_id : int
+  --
+  restaurant_id : int
+  supplier_id : int
+  created_at : timestamp
+  status : varchar(20)
+}
+
+entity "product_order_items" as product_order_items {
+  * order_id : int
+  * product_id : int
+  --
+  quantity : int
+  unit_price : money
+}
+
+users ||--o{ active_orders : places
+users ||--o{ order_history : has_history
+active_orders ||--|{ order_history : becomes
+active_orders }o--o{ order_dishes : contains
+order_dishes }o--|| menu_items : has_item
+users ||--o{ favorite_dish : usually_orders
+menu_items ||--o{ favorite_dish : is
+active_orders }o--|| order_status : has_status
+order_history }o--|| order_status : had_status
+restaurants ||--o{ active_orders : receives
+restaurants ||--o{ order_history : served
+coupons ||--o{ used_coupons : applied
+users ||--o{ used_coupons : uses
+active_orders ||--o{ used_coupons : associated_with
+restaurants ||--o{ menu_items : offers
+menu_items }o--|| dish_categories : categorized_as
+employees  ||--o{ restaurant_employees : works_in
+restaurants ||--o{ restaurant_employees : employs
+storages   ||--o{ storage_restaurants : linked_to
+restaurants ||--o{ storage_restaurants : has_storage
+storages   ||--o{ storage_products : stores
+products   ||--o{ storage_products : stocked
+suppliers  ||--o{ supplier_products : supplies
+products   ||--o{ supplier_products : delivered_by
+restaurants ||--o{ product_orders : places_order
+suppliers ||--o{ product_orders : receives_order
+product_orders ||--o{ product_order_items : includes
+products ||--o{ product_order_items : contains
+@enduml

@@ -1,0 +1,7 @@
+FORMAT="png"
+NAME="Screenshot$(date "+%d-%m-%y %H:%M:%S")"
+PICTPATH="$HOME/Pictures/screenshots/"
+OUTPUT="$NAME.$FORMAT"
+
+grim "${PICTPATH}${OUTPUT}"
+#notify-send "Screenshot" "File saved as <i>'$OUTPUT'</i>"
